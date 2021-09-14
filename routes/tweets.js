@@ -4,9 +4,12 @@ const asyncHandler = require('express-async-handler')
 const { Tweet } = require('../db/models')
 const { check } = require('express-validator')
 const { handleValidationErrors } = require('../utils')
+const { requireAuth } = require("../auth");
 
 
 router = express.Router()
+
+router.use(requireAuth);
 
 const tweetValidators = [
     check('message')
