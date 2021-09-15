@@ -27,7 +27,11 @@ const tweetNotFoundError = (tweetId) => {
 }
 
 router.get("/", asyncHandler(async (req, res) => {
-    const tweets = await Tweet.findAll()
+    const tweets = await Tweet.findAll({
+        include: [{ model: User, as: "user", attributes: ["username"] }],
+        order: [["createdAt", "DESC"]],
+        attributes: ["message"],
+    });
     res.json({ tweets });
 }));
 
@@ -46,7 +50,8 @@ router.get("/:id(\\d+)", asyncHandler(async (req, res, next) => {
 router.post("/", tweetValidators, handleValidationErrors, asyncHandler(async (req, res, next) => {
     const { message } = req.body
     const newTweet = await Tweet.create({
-        message
+        message,
+        userId: req.user.id
     })
     res.json({newTweet})
 }))
