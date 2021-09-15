@@ -2,10 +2,11 @@ const express = require('express');
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcryptjs')
 
-const { User } = require('../db/models')
+const { User, Tweet } = require('../db/models')
 const { getUserToken } = require('../auth')
 const { check } = require("express-validator");
 const { handleValidationErrors } = require("../utils");
+const { requireAuth } = require("../auth");
 
 router = express.Router();
 
@@ -68,6 +69,15 @@ router.post(
         res.json({ token, user: { id: user.id } });
     })
 );
+
+
+router.get("/:id/tweets", requireAuth, asyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    const tweets = await Tweet.findAll({
+        where: { userId }
+    });
+    res.json({ tweets });
+}));
 
 
 module.exports = router
